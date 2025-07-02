@@ -79,6 +79,10 @@ Rispondi sempre in italiano, con tono empatico.
     )
     return response.choices[0].message.content.strip()
         
+@app.route("/", methods=["GET"])
+def home():
+    return "✅ API online"
+        
 @app.route("/chat-sugestoes", methods=["POST"])
 def chat_sugestoes():
     data = request.get_json()
