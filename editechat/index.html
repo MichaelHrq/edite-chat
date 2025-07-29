@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat IA</title>
+    <style>
+      /* --- Estilos CSS Completos --- */
+      body {
+        font-family: sans-serif;
+      }
+      #chat-ia-widget {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+      }
+      #chat-ia-toggle {
+        background: #8e44ad;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #chat-ia-box {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 320px;
+        max-height: 500px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+      }
+      #chat-ia-box .close {
+        display: none;
+      }
+      #chat-ia-header {
+        background: #8e44ad;
+        color: white;
+        padding: 12px;
+        font-weight: bold;
+        text-align: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      #chat-ia-header svg {
+        cursor: pointer;
+        fill: white;
+        width: 20px;
+        height: 20px;
+      }
+      #chat-ia-mensagens {
+        flex: 1;
+        padding: 12px;
+        overflow-y: auto;
+        max-height: 300px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-height: 140px;
+      }
+      .messaggio {
+        padding: 10px 14px;
+        border-radius: 18px;
+        font-size: 14px;
+        max-width: 80%;
+        line-height: 1.4;
+        word-wrap: break-word;
+      }
+      .assistente {
+        background-color: #f1f0f0;
+        color: #333;
+        align-self: flex-start;
+        border-bottom-left-radius: 4px;
+      }
+      .utente {
+        background-color: #8e44ad;
+        color: white;
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+      }
+      #chat-ia-input {
+        display: flex;
+        border-top: 1px solid #ddd;
+      }
+      #chat-ia-input textarea {
+        flex: 1;
+        padding: 10px;
+        border: #8e44ad 2px solid;
+        resize: none;
+        font-size: 14px;
+        outline: none;
+        border-radius: 0 0 0 12px;
+      }
+      #chat-ia-input button {
+        background: #8e44ad;
+        color: white;
+        border: none;
+        padding: 0 15px;
+        cursor: pointer;
+        font-size: 18px;
+      }
+
+      /* --- Estilos para Telas Móveis (NOVO) --- */
+      @media (max-width: 480px) {
+        /* A caixa de chat ocupa a tela toda para uma melhor experiência */
+        #chat-ia-box {
+          margin: 4px;
+          width: calc(100% - 8px);
+          border-radius: 12px;
+          bottom: 0;
+          left: 0;
+        }
+
+        #chat-ia-toggle {
+          width: 45px;
+          height: 45px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="chat-ia-widget">
+      <button id="chat-ia-toggle">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="40"
+          height="40"
+          viewBox="0 0 48 48"
+        >
+          <path
+            fill="currentColor"
+            fill-rule="evenodd"
+            d="M29.032 15.093C28.178 14.682 27.181 14.33 26 14c1.18-.331 2.178-.682 3.032-1.093c1.822-.876 2.988-2.03 3.875-3.864C33.319 8.189 33.67 7.189 34 6c.33 1.189.68 2.19 1.093 3.043c.887 1.835 2.053 2.988 3.875 3.864c.853.411 1.851.762 3.032 1.093c-1.18.331-2.178.682-3.032 1.093c-1.822.877-2.988 2.03-3.875 3.864c-.412.854-.764 1.854-1.093 3.043c-.33-1.189-.68-2.19-1.093-3.043c-.887-1.835-2.053-2.988-3.875-3.864m3.69.146A9.5 9.5 0 0 0 31.173 14a9.5 9.5 0 0 0 1.55-1.24A9.5 9.5 0 0 0 34 11.18a9.4 9.4 0 0 0 1.278 1.582c.474.47.99.878 1.549 1.239a9.5 9.5 0 0 0-1.55 1.24A9.5 9.5 0 0 0 34 16.82a9.5 9.5 0 0 0-1.278-1.582M9.304 29.064A41 41 0 0 0 6 28a41 41 0 0 0 3.304-1.064c5.083-1.906 7.707-4.477 9.632-9.612A40 40 0 0 0 20 14a40 40 0 0 0 1.064 3.324c1.925 5.135 4.55 7.706 9.632 9.612c1.002.376 2.098.726 3.304 1.064a41 41 0 0 0-3.304 1.064c-5.083 1.906-7.707 4.477-9.632 9.612A40 40 0 0 0 20 42a40 40 0 0 0-1.064-3.324c-1.925-5.135-4.55-7.706-9.632-9.612m7.403 2.17c-1.343-1.334-2.916-2.37-4.765-3.234c1.849-.864 3.422-1.9 4.765-3.233c1.355-1.345 2.412-2.93 3.293-4.808c.88 1.878 1.938 3.463 3.293 4.808c1.343 1.333 2.916 2.369 4.765 3.233c-1.849.864-3.422 1.9-4.765 3.233c-1.355 1.345-2.412 2.93-3.293 4.808c-.88-1.878-1.938-3.463-3.293-4.807"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </button>
+      <div id="chat-ia-box">
+        <div id="chat-ia-header">
+          <div id="chat-ia-header-title"></div>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="-6 -6 24 24"
+            id="chat-ia-close"
+          >
+            <path
+              fill="currentColor"
+              d="m7.314 5.9l3.535-3.536A1 1 0 1 0 9.435.95L5.899 4.485L2.364.95A1 1 0 1 0 .95 2.364l3.535 3.535L.95 9.435a1 1 0 1 0 1.414 1.414l3.535-3.535l3.536 3.535a1 1 0 1 0 1.414-1.414L7.314 5.899z"
+            />
+          </svg>
+        </div>
+        <div id="chat-ia-mensagens"></div>
+        <div id="chat-ia-input">
+          <textarea id="chat-ia-texto"></textarea>
+          <button id="chat-ia-send-btn">➤</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Envolve todo o código para garantir que o HTML seja carregado primeiro
+      document.addEventListener("DOMContentLoaded", function () {
+        // --- ELEMENTOS DO DOM ---
+        const toggle = document.getElementById("chat-ia-toggle");
+        const close = document.getElementById("chat-ia-close");
+        const chatBox = document.getElementById("chat-ia-box");
+        const chatHeader = document.getElementById("chat-ia-header-title");
+        const mensagens = document.getElementById("chat-ia-mensagens");
+        const textarea = document.getElementById("chat-ia-texto");
+        const sendButton = document.getElementById("chat-ia-send-btn");
+        const api = `http://192.168.1.18:5000/chat-sugestoes`;
+
+        // --- TRADUÇÕES E CONFIGURAÇÃO DE IDIOMA ---
+        const traducoes = {
+          pt: {
+            header: "Conselhos personalizados",
+            placeholder: "Escreva aqui...",
+            welcome: "Olá! Como posso te ajudar hoje?",
+            loading: "⏳ Buscando os melhores produtos para você...",
+            no_response: "❌ Nenhuma resposta encontrada.",
+            error: "❌ Erro: ",
+          },
+          it: {
+            header: "Consigli personalizzati",
+            placeholder: "Scrivi qui...",
+            welcome: "Ciao! Come posso aiutarti oggi?",
+            loading: "⏳ Cerco i migliori prodotti per te...",
+            no_response: "❌ Nessuna risposta trovata.",
+            error: "❌ Errore: ",
+          },
+          en: {
+            header: "Personalized Tips",
+            placeholder: "Write here...",
+            welcome: "Hello! How can I help you today?",
+            loading: "⏳ Searching for the best products for you...",
+            no_response: "❌ No response found.",
+            error: "❌ Error: ",
+          },
+        };
+        const userLang = navigator.language.split("-")[0];
+        const lang = traducoes[userLang] ? userLang : "en";
+        const T = traducoes[lang];
+
+        // --- FUNÇÕES PRINCIPAIS DO CHAT ---
+        function inicializarChat() {
+          chatHeader.textContent = T.header;
+          textarea.placeholder = T.placeholder;
+          mensagens.innerHTML = "";
+          adicionarMensagem("Assistente", T.welcome);
+        }
+
+        async function enviarMensagemIA() {
+          const mensagem = textarea.value.trim();
+          if (!mensagem) return;
+
+          adicionarMensagem("Utente", mensagem);
+          textarea.value = "";
+          textarea.focus();
+
+          // Obtém o idioma do navegador (ex: 'pt', 'en', 'it')
+          const idioma = navigator.language.split("-")[0];
+
+          const divCarregando = adicionarMensagem("Assistente", T.loading);
+
+          try {
+            const resposta = await fetch(api, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              // Inclui o idioma no corpo da requisição
+              body: JSON.stringify({ mensagem, idioma }),
+            });
+
+            // O resto da função continua igual...
+            const data = await resposta.json();
+            setTimeout(() => {
+              const respostaFormatada = formatarRespostaIA(
+                data.resposta || T.no_response
+              );
+              divCarregando.innerHTML = respostaFormatada;
+              scrollParaFim();
+            }, 500);
+          } catch (erro) {
+            divCarregando.innerHTML = T.error + erro.message;
+            scrollParaFim();
+          }
+        }
+
+        // --- FUNÇÕES AUXILIARES ---
+        function adicionarMensagem(origem, texto) {
+          const div = document.createElement("div");
+          div.classList.add("messaggio");
+          div.classList.add(origem.toLowerCase());
+          div.innerHTML = texto;
+          mensagens.appendChild(div);
+          scrollParaFim();
+          return div;
+        }
+
+        function formatarRespostaIA(texto) {
+          if (!texto) return "";
+          let textoFormatado = texto.replace(
+            /\[(.*?)\]\((.*?)\)/g,
+            '<a href="$2" target="_blank" style="color: #8e44ad; text-decoration: underline;">$1</a>'
+          );
+          return textoFormatado.replace(/\n/g, "<br>");
+        }
+
+        function scrollParaFim() {
+          mensagens.scrollTop = mensagens.scrollHeight;
+        }
+
+        // --- EVENT LISTENERS (OUVINTES DE EVENTOS) ---
+        toggle.onclick = () => {
+          chatBox.style.display = "flex";
+          if (chatBox.style.display === "flex") {
+            textarea.focus();
+          }
+        };
+
+        close.onclick = () => {
+          chatBox.style.display = "none";
+          if (chatBox.style.display === "flex") {
+            textarea.focus();
+          }
+        };
+
+        sendButton.onclick = enviarMensagemIA;
+
+        textarea.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            enviarMensagemIA();
+          }
+        });
+
+        // --- INICIALIZAÇÃO ---
+        inicializarChat();
+      });
+    </script>
+  </body>
+</html>
