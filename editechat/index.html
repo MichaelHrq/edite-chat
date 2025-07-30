@@ -6,6 +6,11 @@
     <title>Chat IA</title>
     <style>
       /* --- Estilos CSS Completos --- */
+
+      :root {
+        --global-palette-btn-bg: #d87886;
+      }
+
       body {
         font-family: sans-serif;
       }
@@ -16,12 +21,12 @@
         z-index: 9999;
       }
       #chat-ia-toggle {
-        background: #8e44ad;
+        background: var(--global-palette-btn-bg);
         color: white;
         border: none;
         border-radius: 50%;
-        width: 60px;
-        height: 60px;
+        width: 50px;
+        height: 50px;
         font-size: 24px;
         cursor: pointer;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
@@ -46,10 +51,10 @@
         display: none;
       }
       #chat-ia-header {
-        background: #8e44ad;
+        background: var(--global-palette-btn-bg);
         color: white;
         padding: 12px;
-        font-weight: bold;
+        font-weight: 600;
         text-align: center;
         display: flex;
         justify-content: space-between;
@@ -69,7 +74,7 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
-        min-height: 140px;
+        min-height: 300px;
       }
       .messaggio {
         padding: 10px 14px;
@@ -86,7 +91,7 @@
         border-bottom-left-radius: 4px;
       }
       .utente {
-        background-color: #8e44ad;
+        background-color: var(--global-palette-btn-bg);
         color: white;
         align-self: flex-end;
         border-bottom-right-radius: 4px;
@@ -98,14 +103,14 @@
       #chat-ia-input textarea {
         flex: 1;
         padding: 10px;
-        border: #8e44ad 2px solid;
+        border: var(--global-palette-btn-bg) 2px solid;
         resize: none;
         font-size: 14px;
         outline: none;
         border-radius: 0 0 0 12px;
       }
       #chat-ia-input button {
-        background: #8e44ad;
+        background: var(--global-palette-btn-bg);
         color: white;
         border: none;
         padding: 0 15px;
@@ -118,15 +123,37 @@
         /* A caixa de chat ocupa a tela toda para uma melhor experiência */
         #chat-ia-box {
           margin: 4px;
-          width: calc(100% - 8px);
-          border-radius: 12px;
+          width: calc(80% - 8px);
+          border-radius: 8px;
           bottom: 0;
-          left: 0;
+          right: 0;
         }
-
+        #chat-ia-mensagens {
+          padding: 8px;
+          max-height: 200px;
+          gap: 10px;
+          min-height: 200px;
+        }
+        #chat-ia-header {
+          font-size: 12px;
+          padding: 8px;
+        }
         #chat-ia-toggle {
           width: 45px;
           height: 45px;
+        }
+        .messaggio {
+          font-size: 12px;
+        }
+        #chat-ia-input textarea {
+          flex: 1;
+          padding: 6px;
+          font-size: 12px;
+          border-radius: 0 0 0 8px;
+        }
+        #chat-ia-input button {
+          padding: 0 12px;
+          font-size: 16px;
         }
       }
     </style>
@@ -176,6 +203,7 @@
       // Envolve todo o código para garantir que o HTML seja carregado primeiro
       document.addEventListener("DOMContentLoaded", function () {
         // --- ELEMENTOS DO DOM ---
+
         const toggle = document.getElementById("chat-ia-toggle");
         const close = document.getElementById("chat-ia-close");
         const chatBox = document.getElementById("chat-ia-box");
@@ -183,33 +211,39 @@
         const mensagens = document.getElementById("chat-ia-mensagens");
         const textarea = document.getElementById("chat-ia-texto");
         const sendButton = document.getElementById("chat-ia-send-btn");
+
+        // API DO SERVIDOR
+
         const api = `http://192.168.1.18:5000/chat-sugestoes`;
 
         // --- TRADUÇÕES E CONFIGURAÇÃO DE IDIOMA ---
         const traducoes = {
           pt: {
-            header: "Conselhos personalizados",
+            header: "Assistente Virtual",
             placeholder: "Escreva aqui...",
-            welcome: "Olá! Como posso te ajudar hoje?",
-            loading: "⏳ Buscando os melhores produtos para você...",
-            no_response: "❌ Nenhuma resposta encontrada.",
-            error: "❌ Erro: ",
+            welcome:
+              "Olá! Sou seu assistente virtual. Posso te ajudar a encontrar os melhores produtos e ofertas aqui na Edité. O que você está procurando hoje?",
+            loading: "Buscando os melhores produtos para você...",
+            no_response: "Nenhuma resposta encontrada.",
+            error: "Erro: ",
           },
           it: {
-            header: "Consigli personalizzati",
+            header: "Assistente Virtuale",
             placeholder: "Scrivi qui...",
-            welcome: "Ciao! Come posso aiutarti oggi?",
-            loading: "⏳ Cerco i migliori prodotti per te...",
-            no_response: "❌ Nessuna risposta trovata.",
-            error: "❌ Errore: ",
+            welcome:
+              "Ciao! Sono il tuo assistente virtuale. Posso aiutarti a trovare i migliori prodotti e offerte qui su Edité. Cosa stai cercando oggi?",
+            loading: "Cerco i migliori prodotti per te...",
+            no_response: "Nessuna risposta trovata.",
+            error: "Errore: ",
           },
           en: {
-            header: "Personalized Tips",
+            header: "Virtual Assistant",
             placeholder: "Write here...",
-            welcome: "Hello! How can I help you today?",
-            loading: "⏳ Searching for the best products for you...",
-            no_response: "❌ No response found.",
-            error: "❌ Error: ",
+            welcome:
+              "Hi! I'm your virtual assistant. I can help you find the best products and deals here at Edité. What are you looking for today?",
+            loading: "Searching for the best products for you...",
+            no_response: "No response found.",
+            error: "Error: ",
           },
         };
         const userLang = navigator.language.split("-")[0];
@@ -275,7 +309,7 @@
           if (!texto) return "";
           let textoFormatado = texto.replace(
             /\[(.*?)\]\((.*?)\)/g,
-            '<a href="$2" target="_blank" style="color: #8e44ad; text-decoration: underline;">$1</a>'
+            '<a href="$2" target="_blank" style="color: var(--global-palette-btn-bg); text-decoration: underline;">$1</a>'
           );
           return textoFormatado.replace(/\n/g, "<br>");
         }
