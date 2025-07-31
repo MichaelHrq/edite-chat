@@ -6,10 +6,10 @@ from psycopg2.extras import execute_values
 from dotenv import load_dotenv
 from tqdm import tqdm
 
-load_dotenv()
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
+load_dotenv()
 conn = psycopg2.connect(
     dbname=os.getenv('SB_DBNAME'),
     user=os.getenv('SB_USER'),
