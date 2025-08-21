@@ -214,17 +214,26 @@
 
         // API DO SERVIDOR
 
-        // const api = `http://192.168.1.18:5000/chat-sugestoes`;
-        const api = `https://edite-chat-production.up.railway.app/chat-sugestoes` // https://railway.com/design
+        const api = `http://192.168.1.4:5000/chat-sugestoes`;
+        // const api = `https://edite-chat-production.up.railway.app/chat-sugestoes`; // https://railway.com/design
 
         // --- TRADUÇÕES E CONFIGURAÇÃO DE IDIOMA ---
         const traducoes = {
-          pt: {
+          "pt-br": {
             header: "Assistente Virtual",
             placeholder: "Escreva aqui...",
             welcome:
               "Olá! Sou seu assistente virtual. Posso te ajudar a encontrar os melhores produtos e ofertas aqui na Edité. O que você está procurando hoje?",
             loading: "Buscando os melhores produtos para você...",
+            no_response: "Nenhuma resposta encontrada.",
+            error: "Erro: ",
+          },
+          "pt-pt": {
+            header: "Assistente Virtual",
+            placeholder: "Escreva aqui...",
+            welcome:
+              "Olá! Sou o teu assistente virtual. Posso ajudar-te a encontrar os melhores produtos e promoções aqui na Edité. O que procuras hoje?",
+            loading: "A procurar os melhores produtos para ti...",
             no_response: "Nenhuma resposta encontrada.",
             error: "Erro: ",
           },
@@ -246,10 +255,19 @@
             no_response: "No response found.",
             error: "Error: ",
           },
+          fr: {
+            header: "Assistant Virtuel",
+            placeholder: "Écris ici...",
+            welcome:
+              "Bonjour ! Je suis ton assistant virtuel. Je peux t’aider à trouver les meilleurs produits et offres ici chez Edité. Que recherches-tu aujourd’hui ?",
+            loading: "Je cherche les meilleurs produits pour toi...",
+            no_response: "Aucune réponse trouvée.",
+            error: "Erreur : ",
+          },
         };
-        const userLang = navigator.language.split("-")[0];
+        const userLang = navigator.language.toLowerCase();
         const lang = traducoes[userLang] ? userLang : "en";
-        const T = traducoes[lang];
+        const T = traducoes['pt-pt'];
 
         // --- FUNÇÕES PRINCIPAIS DO CHAT ---
         function inicializarChat() {

@@ -59,9 +59,13 @@ def buscar_produtos(embedding, limite=5):
 def gerar_resposta(intencao, produtos, idioma='en'):
     # Dicionário com os textos do prompt em cada idioma
     textos_prompt = {
-        'pt': {
+        'pt-br': {
             'instrucao_sistema': "Você é um assistente virtual amigável para uma loja de cosméticos. Responda sempre em português do Brasil com um tom empático e prestativo. Sugira até 3 produtos da lista fornecida.",
             'header_produtos': "Aqui estão os produtos mais relevantes para usar na sua resposta:"
+        },
+        'pt-pt': {
+            'instrucao_sistema': "És um assistente virtual amigável para uma loja de cosméticos. Responde sempre em português de Portugal com um tom empático e prestável. Sugere até 3 produtos da lista fornecida.",
+            'header_produtos': "Aqui estão os produtos mais relevantes para usares na tua resposta:"
         },
         'it': {
             'instrucao_sistema': "Sei un assistente virtuale amichevole per un negozio di cosmetici. Rispondi sempre in italiano con un tono empatico e utile. Suggerisci fino a 3 prodotti dalla lista fornita.",
@@ -70,6 +74,10 @@ def gerar_resposta(intencao, produtos, idioma='en'):
         'en': {
             'instrucao_sistema': "You are a friendly virtual assistant for a cosmetics store. Always answer in English with an empathetic and helpful tone. Suggest up to 3 products from the provided list.",
             'header_produtos': "Here are the most relevant products to use in your answer:"
+        },
+        'fr': {
+            'instrucao_sistema': "Tu es un assistant virtuel amical pour une boutique de cosmétiques. Réponds toujours en français avec un ton empathique et serviable. Suggère jusqu’à 3 produits de la liste fournie.",
+            'header_produtos': "Voici les produits les plus pertinents à utiliser dans ta réponse :"
         }
     }
 
