@@ -20,13 +20,18 @@ conn = psycopg2.connect(
 
 cursor = conn.cursor()
 
+print("Limpando a tabela 'produtos_vetoriais'...")
+cursor.execute("TRUNCATE TABLE produtos_vetoriais RESTART IDENTITY;")
+print("Tabela limpa com sucesso.")
+
 with open('produtos.json', 'r', encoding='utf-8') as f:
     produtos = json.load(f)
     valores = []
     for p in tqdm(produtos):
         try:
             # Preparar texto para embedding
-            texto = f"{p['titulo']} - {p['descricao'] or p.get('resumo', '')}".strip()
+            texto = f"{p['titulo']} - {p['descricao'] or p.get('resumo', '')}".strip(
+            )
             if not texto:
                 continue
 
@@ -47,10 +52,10 @@ with open('produtos.json', 'r', encoding='utf-8') as f:
         except Exception as e:
             print(f"Erro ao processar produto ID {p['id']}: {e}")
             continue
-          
+
         if valores:
-          try:
-              sql = """
+            try:
+                sql = """
               INSERT INTO produtos_vetoriais (id, titulo, descricao, url, embedding)
               VALUES %s
               ON CONFLICT (id) DO UPDATE SET
@@ -59,13 +64,13 @@ with open('produtos.json', 'r', encoding='utf-8') as f:
                 url = EXCLUDED.url,
                 embedding = EXCLUDED.embedding
               """
-              execute_values(cursor, sql, valores)
-              conn.commit()
-              print(f"✅ {len(valores)} produtos inseridos com sucesso.")
-          except Exception as e:
-              print("Erro ao inserir no banco:", e)
+                execute_values(cursor, sql, valores)
+                conn.commit()
+                print(f"✅ {len(valores)} produtos inseridos com sucesso.")
+            except Exception as e:
+                print("Erro ao inserir no banco:", e)
         else:
             print("⚠️ Nenhum produto válido para inserir.")
-        
+
 cursor.close()
 conn.close()

@@ -1,6 +1,7 @@
-import psycopg2
-import os
 import io
+import os
+
+import psycopg2
 from dotenv import load_dotenv
 
 # Carrega as variáveis de ambiente do seu arquivo .env
@@ -30,12 +31,13 @@ try:
     print("Tabela limpa com sucesso.")
 
     # --- PASSO 2: PREENCHER A TABELA COM O CSV ---
-    print(f"Iniciando o carregamento de dados do arquivo '{NOME_DO_ARQUIVO_CSV}'...")
-    
+    print(
+        f"Iniciando o carregamento de dados do arquivo '{NOME_DO_ARQUIVO_CSV}'...")
+
     with open(NOME_DO_ARQUIVO_CSV, 'r', encoding='utf-8') as f:
         # Pula o cabeçalho do CSV. Se o seu CSV NÃO tiver cabeçalho, comente a linha abaixo.
-        next(f) 
-        
+        next(f)
+
         # Usamos copy_expert (ou copy_from) para um carregamento em massa eficiente.
         # Isso envia o arquivo inteiro para o Postgres de uma vez.
         cursor.copy_expert(
@@ -54,7 +56,8 @@ try:
     # Opcional: Contar as linhas para verificar
     cursor.execute("SELECT COUNT(*) FROM produtos_vetoriais;")
     count = cursor.fetchone()[0]
-    print(f"Verificação: A tabela 'produtos_vetoriais' agora contém {count} linhas.")
+    print(
+        f"Verificação: A tabela 'produtos_vetoriais' agora contém {count} linhas.")
 
 
 except (Exception, psycopg2.Error) as error:

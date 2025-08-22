@@ -3,10 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chat IA</title>
+    <title>Chat IA Melhorado</title>
     <style>
-      /* --- Estilos CSS Completos --- */
-
       :root {
         --global-palette-btn-bg: #d87886;
       }
@@ -118,39 +116,81 @@
         font-size: 18px;
       }
 
-      /* --- Estilos para Telas Móveis (NOVO) --- */
+      #chat-ia-send-btn {
+        border-radius: 0 !important;
+      }
+
+      /* --- Estilos para o Tooltip (NOVO) --- */
+      #chat-ia-tooltip {
+        position: absolute; /* Essencial para posicionar a seta */
+        width: 180px;
+        bottom: 0px;
+        right: 55px; /* Ajustado para dar espaço para a seta */
+        background-color: #d87886;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+        z-index: 9998;
+      }
+
+      /* --- NOVO: A seta (chevron) --- */
+      #chat-ia-tooltip::after {
+        content: ""; /* Obrigatório para pseudo-elementos */
+        position: absolute;
+        top: 50%; /* Centraliza verticalmente */
+        left: 100%; /* Posiciona do lado direito do tooltip */
+        margin-top: -6px; /* Ajuste fino para centralizar perfeitamente */
+        border-width: 6px;
+        border-style: solid;
+        border-color: transparent transparent transparent #d87886;
+      }
+
+      /* --- Estilos para Telas Móveis --- */
       @media (max-width: 480px) {
-        /* A caixa de chat ocupa a tela toda para uma melhor experiência */
+
         #chat-ia-box {
-          margin: 4px;
-          width: calc(80% - 8px);
+          display: none;
+          bottom: 10px;
+          right: 10px;
+          left: 10px;
+          width: auto;
+          max-width: 250px;
+          margin-left: auto;
           border-radius: 8px;
-          bottom: 0;
-          right: 0;
         }
+
         #chat-ia-mensagens {
           padding: 8px;
           max-height: 200px;
           gap: 10px;
           min-height: 200px;
         }
+
         #chat-ia-header {
           font-size: 12px;
           padding: 8px;
         }
+
         #chat-ia-toggle {
           width: 45px;
           height: 45px;
         }
+
         .messaggio {
           font-size: 12px;
         }
+
         #chat-ia-input textarea {
           flex: 1;
           padding: 6px;
           font-size: 12px;
           border-radius: 0 0 0 8px;
         }
+
         #chat-ia-input button {
           padding: 0 12px;
           font-size: 16px;
@@ -175,6 +215,8 @@
           />
         </svg>
       </button>
+      <span id="chat-ia-tooltip"></span>
+
       <div id="chat-ia-box">
         <div id="chat-ia-header">
           <div id="chat-ia-header-title"></div>
@@ -200,10 +242,8 @@
     </div>
 
     <script>
-      // Envolve todo o código para garantir que o HTML seja carregado primeiro
       document.addEventListener("DOMContentLoaded", function () {
         // --- ELEMENTOS DO DOM ---
-
         const toggle = document.getElementById("chat-ia-toggle");
         const close = document.getElementById("chat-ia-close");
         const chatBox = document.getElementById("chat-ia-box");
@@ -211,63 +251,69 @@
         const mensagens = document.getElementById("chat-ia-mensagens");
         const textarea = document.getElementById("chat-ia-texto");
         const sendButton = document.getElementById("chat-ia-send-btn");
+        const tooltip = document.getElementById("chat-ia-tooltip"); // NOVO
 
-        // API DO SERVIDOR
-
+        // --- API DO SERVIDOR ---
         const api = `http://192.168.1.4:5000/chat-sugestoes`;
-        // const api = `https://edite-chat-production.up.railway.app/chat-sugestoes`; // https://railway.com/design
+        // const api = `https://edite-chat-production.up.railway.app/chat-sugestoes`;
 
         // --- TRADUÇÕES E CONFIGURAÇÃO DE IDIOMA ---
         const traducoes = {
           "pt-br": {
-            header: "Assistente Virtual",
+            header: "Assistente Virtual (beta)",
             placeholder: "Escreva aqui...",
             welcome:
               "Olá! Sou seu assistente virtual. Posso te ajudar a encontrar os melhores produtos e ofertas aqui na Edité. O que você está procurando hoje?",
             loading: "Buscando os melhores produtos para você...",
             no_response: "Nenhuma resposta encontrada.",
             error: "Erro: ",
+            tooltip: "Clique para abrir o Assistente Virtual (IA)",
           },
           "pt-pt": {
-            header: "Assistente Virtual",
+            header: "Assistente Virtual (beta)",
             placeholder: "Escreva aqui...",
             welcome:
               "Olá! Sou o teu assistente virtual. Posso ajudar-te a encontrar os melhores produtos e promoções aqui na Edité. O que procuras hoje?",
             loading: "A procurar os melhores produtos para ti...",
             no_response: "Nenhuma resposta encontrada.",
             error: "Erro: ",
+            tooltip: "Clica para abrir o Assistente Virtual (IA)",
           },
           it: {
-            header: "Assistente Virtuale",
+            header: "Assistente Virtuale (beta)",
             placeholder: "Scrivi qui...",
             welcome:
               "Ciao! Sono il tuo assistente virtuale. Posso aiutarti a trovare i migliori prodotti e offerte qui su Edité. Cosa stai cercando oggi?",
             loading: "Cerco i migliori prodotti per te...",
             no_response: "Nessuna risposta trovata.",
             error: "Errore: ",
+            tooltip: "Clicca per aprire l'Assistente Virtuale (IA)",
           },
           en: {
-            header: "Virtual Assistant",
+            header: "Virtual Assistant (beta)",
             placeholder: "Write here...",
             welcome:
               "Hi! I'm your virtual assistant. I can help you find the best products and deals here at Edité. What are you looking for today?",
             loading: "Searching for the best products for you...",
             no_response: "No response found.",
             error: "Error: ",
+            tooltip: "Click to open the Virtual Assistant (AI)",
           },
           fr: {
-            header: "Assistant Virtuel",
+            header: "Assistant Virtuel (beta)",
             placeholder: "Écris ici...",
             welcome:
               "Bonjour ! Je suis ton assistant virtuel. Je peux t’aider à trouver les meilleurs produits et offres ici chez Edité. Que recherches-tu aujourd’hui ?",
             loading: "Je cherche les meilleurs produits pour toi...",
             no_response: "Aucune réponse trouvée.",
             error: "Erreur : ",
+            tooltip: "Cliquez pour ouvrir l'Assistant Virtuel (IA)",
           },
         };
+
         const userLang = navigator.language.toLowerCase();
         const lang = traducoes[userLang] ? userLang : "en";
-        const T = traducoes['pt-pt'];
+        const T = traducoes[lang] || traducoes["en"];
 
         // --- FUNÇÕES PRINCIPAIS DO CHAT ---
         function inicializarChat() {
@@ -275,30 +321,49 @@
           textarea.placeholder = T.placeholder;
           mensagens.innerHTML = "";
           adicionarMensagem("Assistente", T.welcome);
+          gerenciarVisibilidadeInicial(); // NOVA LÓGICA
+        }
+
+        function gerenciarVisibilidadeInicial() {
+          const isMobile = window.innerWidth <= 480;
+
+          if (isMobile) {
+            chatBox.style.display = "none"; // Garante que comece fechado no mobile
+
+            if (T.tooltip) {
+              tooltip.textContent = T.tooltip;
+            }
+
+            // Mostra o tooltip após 2 segundos
+            setTimeout(() => {
+              tooltip.style.visibility = "visible";
+              tooltip.style.opacity = "1";
+
+              // Esconde o tooltip 10 segundos depois de ter aparecido
+              setTimeout(() => {
+                tooltip.style.opacity = "0";
+                tooltip.style.visibility = "hidden";
+              }, 10000); // 10s em tela
+            }, 2000); // Aparece após 2s
+          } else {
+            // No desktop, o chat começa aberto (padrão do CSS)
+            chatBox.style.display = "flex";
+          }
         }
 
         async function enviarMensagemIA() {
           const mensagem = textarea.value.trim();
           if (!mensagem) return;
-
           adicionarMensagem("Utente", mensagem);
           textarea.value = "";
           textarea.focus();
-
-          // Obtém o idioma do navegador (ex: 'pt', 'en', 'it')
-          const idioma = navigator.language.split("-")[0];
-
           const divCarregando = adicionarMensagem("Assistente", T.loading);
-
           try {
             const resposta = await fetch(api, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              // Inclui o idioma no corpo da requisição
-              body: JSON.stringify({ mensagem, idioma }),
+              body: JSON.stringify({ mensagem, idioma: userLang }),
             });
-
-            // O resto da função continua igual...
             const data = await resposta.json();
             setTimeout(() => {
               const respostaFormatada = formatarRespostaIA(
@@ -316,8 +381,7 @@
         // --- FUNÇÕES AUXILIARES ---
         function adicionarMensagem(origem, texto) {
           const div = document.createElement("div");
-          div.classList.add("messaggio");
-          div.classList.add(origem.toLowerCase());
+          div.classList.add("messaggio", origem.toLowerCase());
           div.innerHTML = texto;
           mensagens.appendChild(div);
           scrollParaFim();
@@ -337,19 +401,17 @@
           mensagens.scrollTop = mensagens.scrollHeight;
         }
 
-        // --- EVENT LISTENERS (OUVINTES DE EVENTOS) ---
+        // --- EVENT LISTENERS (MODIFICADOS) ---
         toggle.onclick = () => {
           chatBox.style.display = "flex";
-          if (chatBox.style.display === "flex") {
-            textarea.focus();
-          }
+          textarea.focus();
+          // Esconde o tooltip caso o usuário clique para abrir
+          tooltip.style.opacity = "0";
+          tooltip.style.visibility = "hidden";
         };
 
         close.onclick = () => {
           chatBox.style.display = "none";
-          if (chatBox.style.display === "flex") {
-            textarea.focus();
-          }
         };
 
         sendButton.onclick = enviarMensagemIA;
