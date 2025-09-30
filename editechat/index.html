@@ -17,6 +17,7 @@
         bottom: 20px;
         right: 20px;
         z-index: 9999;
+        display: none;
       }
       #chat-ia-toggle {
         background: var(--global-palette-btn-bg);
@@ -33,7 +34,7 @@
         align-items: center;
       }
       #chat-ia-box {
-        display: flex;
+        display: none;
         flex-direction: column;
         position: fixed;
         bottom: 20px;
@@ -243,10 +244,19 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
+
+        const widget = document.getElementById("chat-ia-widget")
+        const chatBox = document.getElementById("chat-ia-box");
+        widget.style.display = "block"
+
+        if (window.location.pathname !== "/") {
+          chatBox.style.display = "flex";
+        }
+
         // --- ELEMENTOS DO DOM ---
         const toggle = document.getElementById("chat-ia-toggle");
         const close = document.getElementById("chat-ia-close");
-        const chatBox = document.getElementById("chat-ia-box");
+        
         const chatHeader = document.getElementById("chat-ia-header-title");
         const mensagens = document.getElementById("chat-ia-mensagens");
         const textarea = document.getElementById("chat-ia-texto");
@@ -254,8 +264,8 @@
         const tooltip = document.getElementById("chat-ia-tooltip"); // NOVO
 
         // --- API DO SERVIDOR ---
-        const api = `http://192.168.1.4:5000/chat-sugestoes`;
-        // const api = `https://edite-chat-production.up.railway.app/chat-sugestoes`;
+        // const api = `http://192.168.1.4:5000/chat-sugestoes`;
+        const api = `https://edite-chat-production.up.railway.app/chat-sugestoes`;
 
         // --- TRADUÇÕES E CONFIGURAÇÃO DE IDIOMA ---
         const traducoes = {
@@ -345,9 +355,6 @@
                 tooltip.style.visibility = "hidden";
               }, 10000); // 10s em tela
             }, 2000); // Aparece após 2s
-          } else {
-            // No desktop, o chat começa aberto (padrão do CSS)
-            chatBox.style.display = "flex";
           }
         }
 

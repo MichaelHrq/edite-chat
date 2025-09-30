@@ -100,7 +100,7 @@ A intenção do cliente é: "{intencao}"
 
     # Chama a API do OpenAI com as novas instruções
     response = openai.chat.completions.create(
-        model="gpt-4",
+        model="gpt-3.5-turbo",
         messages=[
             # Instrução geral sobre como o modelo deve se comportar
             {"role": "system", "content": textos['instrucao_sistema']},
