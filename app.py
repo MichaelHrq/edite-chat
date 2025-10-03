@@ -59,27 +59,27 @@ def buscar_produtos(embedding, limite=5):
 def gerar_resposta(intencao, produtos, idioma='en'):
     # Dicionário com os textos do prompt em cada idioma
     textos_prompt = {
-        'pt-br': {
-            'instrucao_sistema': "Você é um assistente virtual amigável para uma loja de cosméticos. Responda sempre em português do Brasil com um tom empático e prestativo. Sugira até 3 produtos da lista fornecida.",
-            'header_produtos': "Aqui estão os produtos mais relevantes para usar na sua resposta:"
-        },
-        'pt-pt': {
-            'instrucao_sistema': "És um assistente virtual amigável para uma loja de cosméticos. Responde sempre em português de Portugal com um tom empático e prestável. Sugere até 3 produtos da lista fornecida.",
-            'header_produtos': "Aqui estão os produtos mais relevantes para usares na tua resposta:"
-        },
-        'it': {
-            'instrucao_sistema': "Sei un assistente virtuale amichevole per un negozio di cosmetici. Rispondi sempre in italiano con un tono empatico e utile. Suggerisci fino a 3 prodotti dalla lista fornita.",
-            'header_produtos': "Ecco i prodotti più rilevanti da usare nella tua risposta:"
-        },
-        'en': {
-            'instrucao_sistema': "You are a friendly virtual assistant for a cosmetics store. Always answer in English with an empathetic and helpful tone. Suggest up to 3 products from the provided list.",
-            'header_produtos': "Here are the most relevant products to use in your answer:"
-        },
-        'fr': {
-            'instrucao_sistema': "Tu es un assistant virtuel amical pour une boutique de cosmétiques. Réponds toujours en français avec un ton empathique et serviable. Suggère jusqu’à 3 produits de la liste fournie.",
-            'header_produtos': "Voici les produits les plus pertinents à utiliser dans ta réponse :"
-        }
-    }
+  "pt-br": {
+    "instrucao_sistema": "Você é um assistente virtual amigável para uma loja de cosméticos. Responda sempre em português brasileiro com um tom empático e prestativo. Sugira até 3 produtos da lista fornecida. Na listagem de produtos, inclua o título (com o link para compra) e uma breve descrição.",
+    "header_produtos": "Aqui estão os produtos mais relevantes para usar na sua resposta:"
+  },
+  "pt-pt": {
+    "instrucao_sistema": "És um assistente virtual amigável para uma loja de cosméticos. Responde sempre em português de Portugal com um tom empático e prestável. Sugere até 3 produtos da lista fornecida. Na listagem de produtos, inclui o título (com o link para compra) e uma breve descrição.",
+    "header_produtos": "Aqui estão os produtos mais relevantes para usares na tua resposta:"
+  },
+  "it": {
+    "instrucao_sistema": "Sei un assistente virtuale e amichevole per un negozio di cosmetici. Rispondi sempre in italiano con un tono empatico e utile. Suggerisci fino a 3 prodotti dalla lista fornita. Nell'elenco dei prodotti, includi il titolo (con il link per l'acquisto) e una breve descrizione.",
+    "header_produtos": "Ecco i prodotti più rilevanti da usare nella tua risposta:"
+  },
+  "en": {
+    "instrucao_sistema": "You are a friendly virtual assistant for a cosmetics store. Always answer in English with an empathetic and helpful tone. Suggest up to 3 products from the provided list. In the product listing, include the product title (with the purchase link) and a brief description.",
+    "header_produtos": "Here are the most relevant products to use in your answer:"
+  },
+  "fr": {
+    "instrucao_sistema": "Tu es un assistant virtuel amical pour une boutique de cosmétiques. Réponds toujours en français avec un ton empathique et serviable. Suggère jusqu’à 3 produits de la liste fournie. Dans la liste des produits, inclue le titre (avec le lien d'achat) et une brève description.",
+    "header_produtos": "Voici les produits les plus pertinents à utiliser dans ta réponse :"
+  }
+}
 
     # Seleciona o texto do idioma correto, ou usa inglês ('en') como padrão
     textos = textos_prompt.get(idioma, textos_prompt['en'])
