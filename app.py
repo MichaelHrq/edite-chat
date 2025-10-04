@@ -27,7 +27,7 @@ def gerar_embedding(texto):
     )
     return response.data[0].embedding
 
-def buscar_produtos(embedding, limite=5):
+def buscar_produtos(embedding, limite=3):
     conn = psycopg2.connect(**SUPABASE_CONFIG)
     cursor = conn.cursor()
 
@@ -40,7 +40,6 @@ def buscar_produtos(embedding, limite=5):
     ORDER BY embedding <-> '{embedding_sql}'::vector
     LIMIT %s;
     """
-
     cursor.execute(sql, (limite,))
     resultados = cursor.fetchall()
 
@@ -112,6 +111,21 @@ A intenção do cliente é: "{intencao}"
     )
 
     return response.choices[0].message.content.strip()
+
+def gerar_log(pergunta, resposta):
+    try:
+        conn = psycopg2.connect(**SUPABASE_CONFIG)
+        cursor = conn.cursor()
+        sql = """
+        INSERT INTO logs_chat (pergunta, resposta)
+        VALUES (%s, %s);
+        """
+        cursor.execute(sql, (pergunta, resposta))
+        conn.commit()
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        print("Erro ao inserir no banco:", e)
         
 @app.route("/", methods=["GET"])
 def home():
@@ -128,11 +142,12 @@ def chat_sugestoes():
 
     try:
         embedding = gerar_embedding(pergunta)
-        produtos = buscar_produtos(embedding, limite=5)
+        produtos = buscar_produtos(embedding, limite=3)
         if not produtos:
             return jsonify({"resposta": "Non ho trovato nessun prodotto adatto, mi dispiace!"})
         resposta = gerar_resposta(pergunta, produtos, idioma=idioma)
-        return jsonify({"resposta": resposta})
+        gerar_log(pergunta, resposta)
+        return jsonify({"resposta": resposta, "produtos": produtos})
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
 
