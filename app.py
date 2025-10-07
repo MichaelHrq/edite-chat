@@ -55,7 +55,7 @@ def buscar_produtos(embedding, limite=3):
         })
     return produtos
 
-def gerar_resposta(intencao, produtos, idioma='en'):
+def gerar_resposta(intencao, produtos, idioma='en-us'):
     # Dicionário com os textos do prompt em cada idioma
     textos_prompt = {
   "pt-br": {
@@ -66,15 +66,15 @@ def gerar_resposta(intencao, produtos, idioma='en'):
     "instrucao_sistema": "És um assistente virtual amigável para uma loja de cosméticos. Responde sempre em português de Portugal com um tom empático e prestável. Sugere até 3 produtos da lista fornecida. Na listagem de produtos, o nome do produto deve estar como link (sem usar palavras como 'aqui' ou 'neste link') e acompanhado de uma breve descrição.",
     "header_produtos": "Aqui estão os produtos mais relevantes para usares na tua resposta:"
   },
-  "it": {
+  'it-it': {
     "instrucao_sistema": "Sei un assistente virtuale e amichevole per un negozio di cosmetici. Rispondi sempre in italiano con un tono empatico e utile. Suggerisci fino a 3 prodotti dalla lista fornita. Nell'elenco dei prodotti, il nome del prodotto deve essere un link (senza usare parole come 'qui') e accompagnato da una breve descrizione.",
     "header_produtos": "Ecco i prodotti più rilevanti da usare nella tua risposta:"
   },
-  "en": {
+  'en-us': {
     "instrucao_sistema": "You are a friendly virtual assistant for a cosmetics store. Always answer in English with an empathetic and helpful tone. Suggest up to 3 products from the provided list. In the product listing, the product name must be a link (without using words like 'here' or 'click here') and followed by a brief description.",
     "header_produtos": "Here are the most relevant products to use in your answer:"
   },
-  "fr": {
+  'fr-fr': {
     "instrucao_sistema": "Tu es un assistant virtuel amical pour une boutique de cosmétiques. Réponds toujours en français avec un ton empathique et serviable. Suggère jusqu’à 3 produits de la liste fournie. Dans la liste des produits, le nom du produit doit être un lien (sans utiliser des mots comme 'ici') et accompagné d’une brève description.",
     "header_produtos": "Voici les produits les plus pertinents à utiliser dans ta réponse :"
   }
@@ -82,7 +82,7 @@ def gerar_resposta(intencao, produtos, idioma='en'):
 
 
     # Seleciona o texto do idioma correto, ou usa inglês ('en') como padrão
-    textos = textos_prompt.get(idioma, textos_prompt['en'])
+    textos = textos_prompt.get(idioma, textos_prompt['en-us'])
 
     # Formata a lista de produtos
     lista_produtos = "\n".join([
@@ -110,7 +110,7 @@ A intenção do cliente é: "{intencao}"
         temperature=0.8
     )
 
-    return response.choices[0].message.content.strip()
+    return response.choices[0].message.content.strip(), prompt_usuario
 
 def gerar_log(pergunta, resposta):
     try:
@@ -135,7 +135,7 @@ def home():
 def chat_sugestoes():
     data = request.get_json()
     pergunta = data.get("mensagem", "").strip()
-    idioma = data.get('idioma', 'it')
+    idioma = data.get('idioma', 'en-us')
 
     if not pergunta:
         return jsonify({"erro": "Mensagem vazia"}), 400
@@ -145,9 +145,9 @@ def chat_sugestoes():
         produtos = buscar_produtos(embedding, limite=3)
         if not produtos:
             return jsonify({"resposta": "Non ho trovato nessun prodotto adatto, mi dispiace!"})
-        resposta = gerar_resposta(pergunta, produtos, idioma=idioma)
+        resposta, prompt_usuario = gerar_resposta(pergunta, produtos, idioma=idioma)
         gerar_log(pergunta, resposta)
-        return jsonify({"resposta": resposta, "produtos": produtos})
+        return jsonify({"resposta": resposta})
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
 

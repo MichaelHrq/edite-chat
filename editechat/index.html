@@ -242,14 +242,14 @@
       </div>
     </div>
 
-    <script>
+<script>
       document.addEventListener("DOMContentLoaded", function () {
 
         const widget = document.getElementById("chat-ia-widget")
         const chatBox = document.getElementById("chat-ia-box");
         widget.style.display = "block"
 
-        if (window.location.pathname !== "/") {
+        if(document.body.classList.contains('home')) {
           chatBox.style.display = "flex";
         }
 
@@ -264,8 +264,8 @@
         const tooltip = document.getElementById("chat-ia-tooltip"); // NOVO
 
         // --- API DO SERVIDOR ---
-        // const api = `http://192.168.1.4:5000/chat-sugestoes`;
-        const api = `https://edite-chat-production.up.railway.app/chat-sugestoes`;
+         const api = `http://192.168.1.8:5000/chat-sugestoes`;
+        // const api = `https://edite-chat-production.up.railway.app/chat-sugestoes`;
 
         // --- TRADUÇÕES E CONFIGURAÇÃO DE IDIOMA ---
         const traducoes = {
@@ -289,17 +289,17 @@
             error: "Erro: ",
             tooltip: "Clica para abrir o Assistente Virtual (IA)",
           },
-          it: {
+          'it-it': {
             header: "Assistente Virtuale (beta)",
             placeholder: "Scrivi qui...",
             welcome:
-              "Ciao! Sono il tuo assistente virtuale. Posso aiutarti a trovare i migliori prodotti e offerte qui su Edité. Cosa stai cercando oggi?",
-            loading: "Cerco i migliori prodotti per te...",
+              "Ciao! Sono il tuo assistente virtuale. Posso aiutarti a trovare i migliori produtos e offerte qui su Edité. Cosa stai cercando oggi?",
+            loading: "Cerco i migliori produtos per te...",
             no_response: "Nessuna risposta trovata.",
             error: "Errore: ",
             tooltip: "Clicca per aprire l'Assistente Virtuale (IA)",
           },
-          en: {
+          'en-us': {
             header: "Virtual Assistant (beta)",
             placeholder: "Write here...",
             welcome:
@@ -309,11 +309,11 @@
             error: "Error: ",
             tooltip: "Click to open the Virtual Assistant (AI)",
           },
-          fr: {
+          'fr-fr': {
             header: "Assistant Virtuel (beta)",
             placeholder: "Écris ici...",
             welcome:
-              "Bonjour ! Je suis ton assistant virtuel. Je peux t’aider à trouver les meilleurs produits et offres ici chez Edité. Que recherches-tu aujourd’hui ?",
+              "Bonjour ! Je suis ton assistant virtuel. Je peux t’aider à trouver les meilleurs produits e offres ici chez Edité. Que recherches-tu aujourd’hui ?",
             loading: "Je cherche les meilleurs produits pour toi...",
             no_response: "Aucune réponse trouvée.",
             error: "Erreur : ",
@@ -322,8 +322,10 @@
         };
 
         const userLang = navigator.language.toLowerCase();
-        const lang = traducoes[userLang] ? userLang : "en";
-        const T = traducoes[lang] || traducoes["en"];
+        console.log(userLang);
+        const T = traducoes[userLang] || traducoes['en-us'];
+        // ******************************************************
+
 
         // --- FUNÇÕES PRINCIPAIS DO CHAT ---
         function inicializarChat() {
@@ -339,22 +341,25 @@
 
           if (isMobile) {
             chatBox.style.display = "none"; // Garante que comece fechado no mobile
+          }
 
-            if (T.tooltip) {
-              tooltip.textContent = T.tooltip;
-            }
-
-            // Mostra o tooltip após 2 segundos
-            setTimeout(() => {
-              tooltip.style.visibility = "visible";
-              tooltip.style.opacity = "1";
-
-              // Esconde o tooltip 10 segundos depois de ter aparecido
+          if (T.tooltip) {
+            tooltip.textContent = T.tooltip;
+          }
+            
+          // A lógica de exibição do tooltip só deve rodar em desktop
+          if (isMobile) {
+              // Mostra o tooltip após 2 segundos
               setTimeout(() => {
-                tooltip.style.opacity = "0";
-                tooltip.style.visibility = "hidden";
-              }, 10000); // 10s em tela
-            }, 2000); // Aparece após 2s
+                tooltip.style.visibility = "visible";
+                tooltip.style.opacity = "1";
+
+                // Esconde o tooltip 10 segundos depois de ter aparecido
+                setTimeout(() => {
+                  tooltip.style.opacity = "0";
+                  tooltip.style.visibility = "hidden";
+                }, 10000); // 10s em tela
+              }, 2000); // Aparece após 2s
           }
         }
 
@@ -397,11 +402,14 @@
 
         function formatarRespostaIA(texto) {
           if (!texto) return "";
-          let textoFormatado = texto.replace(
-            /\[(.*?)\]\((.*?)\)/g,
-            '<a href="$2" target="_blank" style="color: var(--global-palette-btn-bg); text-decoration: underline;">$1</a>'
-          );
-          return textoFormatado.replace(/\n/g, "<br>");
+          let textoFormatado = texto
+            .replace(/\*\*(.*?)\*\*/g, "$1")
+            .replace(
+              /\[(.*?)\]\((.*?)\)/g,
+              '<a href="$2" target="_blank" style="color: var(--global-palette-btn-bg); text-decoration: underline;">$1</a>'
+            )
+            .replace(/\n/g, "<br>");
+          return textoFormatado;
         }
 
         function scrollParaFim() {
@@ -410,8 +418,14 @@
 
         // --- EVENT LISTENERS (MODIFICADOS) ---
         toggle.onclick = () => {
-          chatBox.style.display = "flex";
-          textarea.focus();
+          // Alterna a exibição da caixa de chat
+          const isOpened = chatBox.style.display === "flex";
+          chatBox.style.display = isOpened ? "none" : "flex";
+
+          if (!isOpened) {
+            textarea.focus();
+            scrollParaFim();
+          }
           // Esconde o tooltip caso o usuário clique para abrir
           tooltip.style.opacity = "0";
           tooltip.style.visibility = "hidden";
@@ -434,5 +448,6 @@
         inicializarChat();
       });
     </script>
+
   </body>
 </html>
